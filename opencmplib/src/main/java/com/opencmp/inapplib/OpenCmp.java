@@ -1,10 +1,11 @@
 package com.opencmp.inapplib;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.PopupWindow;
@@ -19,13 +20,39 @@ import java.util.Map;
  * Sie implementiert {@link JsProxyInterface}, um auf Aufrufe aus dem CMP heraus zu reagieren.
  */
 public class OpenCmp implements JsProxyInterface {
-    private static OpenCmp instance;
-    private OpenCmpContext context;
-    private WebView cmpView;
+
+    private final OpenCmpContext context;
+    private final OpenCmpStore store;
+    private final Context appContext;
+
     private boolean windowHasFocus = false;
     private boolean waitingForPopup = false;
-    private OpenCmpStore store;
-    PopupWindow popupWindow;
+    private WebView cmpView;
+    private PopupWindow popupWindow;
+
+    private Activity currentActivity;
+
+    public static void initialize(Application app, String domain) {
+
+        OpenCmpContext cmpContext = new OpenCmpContext();
+        cmpContext.domain = domain;
+        OpenCmp openCmp = new OpenCmp(app, cmpContext);
+
+        WebView.setWebContentsDebuggingEnabled(true);
+
+        app.registerActivityLifecycleCallbacks(new OpenCmpLifecycleListener(openCmp));
+    }
+
+
+    public void setCurrentActivity(Activity activity) {
+        this.currentActivity = activity;
+        setupButtons();
+    }
+
+    public void disableActivity(Activity activity) {
+        if (currentActivity == activity)
+            currentActivity = null;
+    }
 
     /**
      * Das Anzeigen des Popup koennte passieren, bevor die App (Activity) den Focus hat. Das wuerde zu einer Exception fuehren, deshalb dieser Workaround.
@@ -41,58 +68,54 @@ public class OpenCmp implements JsProxyInterface {
         }
     }
 
-    private OpenCmp(OpenCmpContext context) {
+    private OpenCmp(Context appContext, OpenCmpContext context) {
         this.context = context;
+        this.appContext = appContext;
+        store = new OpenCmpStore(PreferenceManager.getDefaultSharedPreferences(appContext));
+
+        try {
+            loadCmp();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * Initialisiert das CMP
-     *
-     * @throws Exception
-     */
-    private void init() throws Exception {
-        store = new OpenCmpStore(PreferenceManager.getDefaultSharedPreferences(this.context.context));
-        loadCmp();
-        initSettingsButton();
-        initClearButton();
+
+
+    private void setupButtons() {
+        if (currentActivity == null) return;
+        initSettingsButton(currentActivity.findViewById(R.id.setup_button_id));
+        initClearButton(currentActivity.findViewById(R.id.clear_button_id));
     }
 
     /**
      * Button zum Loeschen des Consent initialisieren
      */
-    private void initClearButton() {
-        if (context.clearButton == null) {
-            return;
-        }
-        context.clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    private void initClearButton(View btnView) {
+        if (btnView != null) {
+            btnView.setOnClickListener(v -> {
                 try {
                     store.clear();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-        });
+            });
+        }
     }
 
     /**
      * Button zum Anzeigen des Popup initialisieren
      */
-    private void initSettingsButton() {
-        if (context.settingsButton == null) {
-            return;
-        }
-        context.settingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    private void initSettingsButton(View btnView) {
+        if (btnView != null) {
+            btnView.setOnClickListener(v -> {
                 try {
                     triggerShowUi();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -101,9 +124,6 @@ public class OpenCmp implements JsProxyInterface {
      */
     private void triggerShowUi() {
         cmpView.loadUrl("javascript:__tcfapi(\"showUi\", 2, function(){})");
-//        cmpView.evaluateJavascript("__tcfapi(\"showUi\", 2, function(){})", value -> {
-//
-//        });
     }
 
     /**
@@ -114,13 +134,13 @@ public class OpenCmp implements JsProxyInterface {
     private void loadCmp() throws Exception {
         try {
             // Html laden
-            InputStream template = context.context.getResources().openRawResource(R.raw.cmp);
+            InputStream template = appContext.getResources().openRawResource(R.raw.cmp);
             String html = StreamUtil.toString(template);
             template.close();
             // Variablen ersetzen
             html = html.replaceAll("\\$domain", context.domain);
             // in Webview oeffnen
-            cmpView = new OpenCmpWebView(context.context);
+            cmpView = new OpenCmpWebView(appContext);
             cmpView.addJavascriptInterface(new JsProxy(this), "opencmpInAppProxy");
             cmpView.loadData(html, "text/html; charset=utf-8", "UTF-8");
         } catch (Exception e) {
@@ -129,51 +149,28 @@ public class OpenCmp implements JsProxyInterface {
     }
 
     /**
-     * Initialisiert die Lib. Im Prinzip ist das ein Singleton, kann aber gerne geaendert werden.
-     *
-     * @param context
-     * @return
-     * @throws Exception
-     */
-    public static OpenCmp setup(OpenCmpContext context) throws Exception {
-        OpenCmp openCmp = getInstance(context);
-        openCmp.init();
-        return openCmp;
-    }
-
-    private static OpenCmp getInstance(OpenCmpContext context) {
-        if (instance == null) {
-            instance = new OpenCmp(context);
-        }
-        return instance;
-    }
-
-    /**
      * Hilfsfunktion zum Anzeigen des Popup.
      *
      * @throws Exception
      */
     private void showUi() throws Exception {
-        if (this.windowHasFocus == false) {
+
+        if (currentActivity == null || !windowHasFocus) {
             waitingForPopup = true;
             return;
         }
-        LayoutInflater inflater = (LayoutInflater) context.context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View popup = inflater.inflate(R.layout.opencmp_popup, null);
-        popupWindow = new PopupWindow(context.activity);
-//        View popupView = android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-//                android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
-//        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+
+        popupWindow = new PopupWindow(appContext);
+
         popupWindow.setOutsideTouchable(false);
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(false);
         popupWindow.setContentView(cmpView);
         popupWindow.setWidth(android.view.ViewGroup.LayoutParams.MATCH_PARENT);
-        popupWindow.setHeight(1500);
-        View view = context.activity.getWindow().getDecorView();
+        popupWindow.setHeight(android.view.ViewGroup.LayoutParams.MATCH_PARENT);
+//        popupWindow.setHeight(1500);
+        View view = currentActivity.getWindow().getDecorView();
         popupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
-
     }
 
     @Override
@@ -184,8 +181,7 @@ public class OpenCmp implements JsProxyInterface {
 
     @Override
     public ConsentString onRequestConsentString() {
-        ConsentString consentString = store.getConsentString();
-        return consentString;
+        return store.getConsentString();
     }
 
     @Override
@@ -200,10 +196,9 @@ public class OpenCmp implements JsProxyInterface {
     @Override
     public void onHideUi() {
         try {
-            if (popupWindow == null) {
-                return;
-            }
-            popupWindow.dismiss();
+            if (popupWindow != null)
+                popupWindow.dismiss();
+
             popupWindow = null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -211,10 +206,9 @@ public class OpenCmp implements JsProxyInterface {
     }
 
     private void updateConsentStore(ConsentString consentString) {
-        if (consentString == null) {
-            return;
+        if (consentString != null) {
+            Map<OpenCmpStore.Property, Object> preferencesMap = TCStringHelper.buildPreferences(consentString);
+            store.update(preferencesMap);
         }
-        Map<OpenCmpStore.Property, Object> preferencesMap = TCStringHelper.buildPreferences(consentString);
-        store.update(preferencesMap);
     }
 }
