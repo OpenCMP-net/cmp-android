@@ -1,7 +1,6 @@
 package com.opencmp.inapplib;
 
 import com.iabtcf.decoder.TCString;
-import com.iabtcf.utils.BitSetIntIterable;
 import com.iabtcf.utils.IntIterable;
 
 import java.util.HashMap;

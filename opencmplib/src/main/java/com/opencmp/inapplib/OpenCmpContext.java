@@ -1,6 +1,15 @@
 package com.opencmp.inapplib;
 
 public class OpenCmpContext {
-    public String domain;
-//    public String activationKey;
+    private final String domain;
+
+    public OpenCmpContext(String domain) {
+        this.domain = domain;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    //    public String activationKey;
 }

@@ -10,6 +10,11 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.PopupWindow;
 
+import androidx.annotation.Nullable;
+
+import com.opencmp.inapplib.errors.CmpLoadingException;
+import com.opencmp.inapplib.errors.HideUiException;
+import com.opencmp.inapplib.errors.ShowUiException;
 import com.opencmp.inapplib.util.StreamUtil;
 
 import java.io.InputStream;
@@ -30,13 +35,18 @@ public class OpenCmp implements JsProxyInterface {
     private WebView cmpView;
     private PopupWindow popupWindow;
 
+    private OpenCmpErrorHandler errorHandler = error -> { };
+
     private Activity currentActivity;
 
     public static void initialize(Application app, String domain) {
+        initialize(app, domain, null);
+    }
 
-        OpenCmpContext cmpContext = new OpenCmpContext();
-        cmpContext.domain = domain;
-        OpenCmp openCmp = new OpenCmp(app, cmpContext);
+    public static void initialize(Application app, String domain, @Nullable OpenCmpErrorHandler errorHandler) {
+
+        OpenCmpContext cmpContext = new OpenCmpContext(domain);
+        OpenCmp openCmp = new OpenCmp(app, cmpContext, errorHandler);
 
         WebView.setWebContentsDebuggingEnabled(true);
 
@@ -58,25 +68,31 @@ public class OpenCmp implements JsProxyInterface {
      * Das Anzeigen des Popup koennte passieren, bevor die App (Activity) den Focus hat. Das wuerde zu einer Exception fuehren, deshalb dieser Workaround.
      *
      * @param focus
-     * @throws Exception
      */
-    public void setWindowHasFocus(boolean focus) throws Exception {
+    public void setWindowHasFocus(boolean focus) {
         windowHasFocus = focus;
         if (focus && waitingForPopup) {
             waitingForPopup = false;
-            showUi();
+            try {
+                showUi();
+            } catch (Exception e) {
+                errorHandler.onOpenCmpError(new ShowUiException(e));
+            }
         }
     }
 
-    private OpenCmp(Context appContext, OpenCmpContext context) {
+    private OpenCmp(Context appContext, OpenCmpContext context, @Nullable OpenCmpErrorHandler errorHandler) {
         this.context = context;
         this.appContext = appContext;
         store = new OpenCmpStore(PreferenceManager.getDefaultSharedPreferences(appContext));
 
+        if (errorHandler != null)
+            this.errorHandler = errorHandler;
+
         try {
             loadCmp();
         } catch (Exception e) {
-            e.printStackTrace();
+            this.errorHandler.onOpenCmpError(e);
         }
     }
 
@@ -126,7 +142,7 @@ public class OpenCmp implements JsProxyInterface {
             String html = StreamUtil.toString(template);
             template.close();
             // Variablen ersetzen
-            html = html.replaceAll("\\$domain", context.domain);
+            html = html.replaceAll("\\$domain", context.getDomain());
             // in Webview oeffnen
             cmpView = new OpenCmpWebView(appContext);
             cmpView.addJavascriptInterface(new JsProxy(this), "opencmpInAppProxy");
@@ -137,7 +153,7 @@ public class OpenCmp implements JsProxyInterface {
 
             cmpView.loadData(html, "text/html; charset=utf-8", "UTF-8");
         } catch (Exception e) {
-            throw e;
+            throw new CmpLoadingException(e);
         }
     }
 
@@ -182,6 +198,7 @@ public class OpenCmp implements JsProxyInterface {
         try {
             showUi();
         } catch (Exception e) {
+            errorHandler.onOpenCmpError(new ShowUiException(e));
             e.printStackTrace();
         }
     }
@@ -194,6 +211,7 @@ public class OpenCmp implements JsProxyInterface {
 
             popupWindow = null;
         } catch (Exception e) {
+            errorHandler.onOpenCmpError(new HideUiException(e));
             e.printStackTrace();
         }
     }
