@@ -93,13 +93,7 @@ public class OpenCmp implements JsProxyInterface {
      */
     private void initClearButton(View btnView) {
         if (btnView != null) {
-            btnView.setOnClickListener(v -> {
-                try {
-                    store.clear();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
+            btnView.setOnClickListener(v -> store.clear());
         }
     }
 
@@ -108,13 +102,7 @@ public class OpenCmp implements JsProxyInterface {
      */
     private void initSettingsButton(View btnView) {
         if (btnView != null) {
-            btnView.setOnClickListener(v -> {
-                try {
-                    triggerShowUi();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
+            btnView.setOnClickListener(v -> triggerShowUi());
         }
     }
 
@@ -142,6 +130,11 @@ public class OpenCmp implements JsProxyInterface {
             // in Webview oeffnen
             cmpView = new OpenCmpWebView(appContext);
             cmpView.addJavascriptInterface(new JsProxy(this), "opencmpInAppProxy");
+
+            cmpView.clearHistory();
+            cmpView.clearFormData();
+            cmpView.clearCache(true);
+
             cmpView.loadData(html, "text/html; charset=utf-8", "UTF-8");
         } catch (Exception e) {
             throw e;

@@ -29,10 +29,9 @@ public class OpenCmpStore {
         IABTCF_PublisherCustomPurposesLegitimateInterests(String.class),
         OpenCmp_Meta(String.class);
 
+        final private Class<?> type;
 
-        private Class type;
-
-        private Property(Class type) {
+        Property(Class<?> type) {
             this.type = type;
         }
     }
@@ -48,7 +47,7 @@ public class OpenCmpStore {
         for (Property property : Property.values()) {
             editor.remove(property.name());
         }
-        editor.commit();
+        editor.apply();
     }
 
     public void update(Map<Property, Object> values) {
@@ -65,7 +64,7 @@ public class OpenCmpStore {
                 editor.putString(key, (String) value);
             }
         }
-        editor.commit();
+        editor.apply();
     }
 
     public ConsentString getConsentString() {

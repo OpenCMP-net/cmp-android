@@ -34,13 +34,7 @@ class OpenCmpLifecycleListener implements Application.ActivityLifecycleCallbacks
     }
 
     @Override
-    public void onActivityPaused(@NonNull Activity activity) {
-//        try {
-//            openCmp.setWindowHasFocus(false);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
-    }
+    public void onActivityPaused(@NonNull Activity activity) { }
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
@@ -48,9 +42,7 @@ class OpenCmpLifecycleListener implements Application.ActivityLifecycleCallbacks
     }
 
     @Override
-    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-
-    }
+    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) { }
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) { }

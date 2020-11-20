@@ -12,7 +12,7 @@ public class JsProxy {
     /**
      * Handler fuer Callbacks
      */
-    private JsProxyInterface handler;
+    private final JsProxyInterface handler;
 
     public JsProxy(JsProxyInterface handler) {
         this.handler = handler;
