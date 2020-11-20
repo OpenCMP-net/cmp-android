@@ -13,10 +13,4 @@ public class CmpLoadingException extends Exception {
     public CmpLoadingException(Throwable cause) {
         super(cause);
     }
-
-    public CmpLoadingException(Exception e) {
-        super(e);
-    }
-
-
 }
