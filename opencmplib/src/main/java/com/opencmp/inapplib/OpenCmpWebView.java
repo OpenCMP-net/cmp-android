@@ -13,15 +13,17 @@ import androidx.annotation.Nullable;
 public class OpenCmpWebView extends WebView {
     public OpenCmpWebView(@NonNull Context context) {
         super(context);
-        this.init();
+        init();
     }
 
     public OpenCmpWebView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
     public OpenCmpWebView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
     }
 
     private void init() {
@@ -32,7 +34,7 @@ public class OpenCmpWebView extends WebView {
         webSettings.setDomStorageEnabled(true);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setGeolocationEnabled(true);
-        setWebViewClient(new OpenCmpWebviewClient(getContext()));
+        setWebViewClient(new OpenCmpWebviewClient());
 //        setWebChromeClient(new WebChromeClient());
     }
 }
