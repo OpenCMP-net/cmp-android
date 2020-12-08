@@ -27,7 +27,9 @@ public class OpenCmpStore {
         IABTCF_PublisherLegitimateInterests(String.class),
         IABTCF_PublisherCustomPurposesConsents(String.class),
         IABTCF_PublisherCustomPurposesLegitimateInterests(String.class),
-        OpenCmp_Meta(String.class);
+        OpenCmp_Meta(String.class),
+        IABTCF_CustomVendorConsents(String.class),
+        IABTCF_CustomVendorLegitimateInterests(String.class);
 
         final private Class<?> type;
 
