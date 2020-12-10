@@ -1,0 +1,3 @@
+include ':opencmplib'
+include ':app'
+rootProject.name = "inappcmp"
