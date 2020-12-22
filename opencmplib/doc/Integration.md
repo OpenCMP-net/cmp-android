@@ -8,20 +8,41 @@ Die Integration erfolgt in der Application Klasse:
 ```
 package com.example.inappcmp;
 
+import android.app.Application;
+import android.util.Log;
+
 import com.opencmp.inapplib.OpenCmp;
+import com.opencmp.inapplib.OpenCmpConfig;
 import com.opencmp.inapplib.OpenCmpStore;
+import com.opencmp.inapplib.Property;
 
 public class App extends Application {
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         // CMP initialisation
-        OpenCmp.initialize(this, "domain.com", this::handleError);
+        OpenCmpConfig config = new OpenCmpConfig.Builder("traffective.com")
+            // optional, if it is skipped the library takes default SharedPreference name
+            .setStorageName("open_cmp.storage")
+            // Optional value, null as default
+            // Error handling
+            .setErrorHandler(this::handleError)
+            // Optional value, null as default
+            // Check Consent Changes, you can extend interface OpenCmpStore
+            .setChangesListener(this::consentChanged)
+            .build();
+
+        OpenCmp.initialize(this, config);
     }
 
     private void handleError(Exception e) {
         Log.e("OpenCmp", e.getMessage(), e);
+    }
+
+    private void consentChanged(OpenCmpStore store, Property property) {
+        Log.i("OpenCmp", "Consent changed: " + property.name());
     }
 }
 
@@ -40,6 +61,9 @@ Es kann ein Button konfiguriert werden, ueber den der User nachtraeglich das CMP
 ```
 ###Reagieren auf Erstellung des/Aenderung beim Consent
 Der Consent wird in den Shared Preferences abgelegt. Jede Aenderung am Consent kann ueber einen Listener durch den Publisher oder die Vendoren abgefragt werden.
+
+
+Changed:
 
 Integration mit Listener:
 ```

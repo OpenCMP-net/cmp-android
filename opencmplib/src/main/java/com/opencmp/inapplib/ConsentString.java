@@ -10,6 +10,7 @@ public class ConsentString {
     public String google;
     public String custom;
     public JSONObject meta;
+    public JSONObject preferences;
 
     @NonNull
     @Override
@@ -23,6 +24,7 @@ public class ConsentString {
         cs.google = json.getString("google");
         cs.custom = json.getString("custom");
         cs.meta = json.getJSONObject("meta");
+        cs.preferences = json.getJSONObject("preferences");
         return cs;
     }
 

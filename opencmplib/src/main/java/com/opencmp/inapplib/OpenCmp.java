@@ -3,6 +3,7 @@ package com.opencmp.inapplib;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.PopupWindow;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.opencmp.inapplib.errors.CmpLoadingException;
@@ -39,14 +41,14 @@ public class OpenCmp implements JsProxyInterface {
 
     private Activity currentActivity;
 
-    public static void initialize(Application app, String domain) {
-        initialize(app, domain, null);
-    }
+    public static void initialize(@NonNull Application app, @NonNull OpenCmpConfig config) {
 
-    public static void initialize(Application app, String domain, @Nullable OpenCmpErrorHandler errorHandler) {
+        final OpenCmpContext cmpContext = new OpenCmpContext(config.domain);
+        final String storeName =  config.storageName != null ? config.storageName : PreferenceManager.getDefaultSharedPreferencesName(app);
+        final SharedPreferences prefs = app.getSharedPreferences(storeName, Context.MODE_PRIVATE);
+        final SharedPreferenceOpenCmpStore store = new SharedPreferenceOpenCmpStore(prefs, config.changesListener);
 
-        OpenCmpContext cmpContext = new OpenCmpContext(domain);
-        OpenCmp openCmp = new OpenCmp(app, cmpContext, errorHandler);
+        final OpenCmp openCmp = new OpenCmp(app, cmpContext, store, config.errorHandler);
 
         WebView.setWebContentsDebuggingEnabled(true);
 
@@ -54,12 +56,12 @@ public class OpenCmp implements JsProxyInterface {
     }
 
 
-    public void setCurrentActivity(Activity activity) {
+    void setCurrentActivity(Activity activity) {
         this.currentActivity = activity;
         setupButtons();
     }
 
-    public void disableActivity(Activity activity) {
+    void disableActivity(Activity activity) {
         if (currentActivity == activity)
             currentActivity = null;
     }
@@ -81,10 +83,15 @@ public class OpenCmp implements JsProxyInterface {
         }
     }
 
-    private OpenCmp(Context appContext, OpenCmpContext context, @Nullable OpenCmpErrorHandler errorHandler) {
+    private OpenCmp(
+        Context appContext,
+        OpenCmpContext context,
+        OpenCmpStore store,
+        @Nullable OpenCmpErrorHandler errorHandler
+    ) {
         this.context = context;
         this.appContext = appContext;
-        store = new OpenCmpStore(PreferenceManager.getDefaultSharedPreferences(appContext));
+        this.store = store;
 
         if (errorHandler != null)
             this.errorHandler = errorHandler;
@@ -218,7 +225,7 @@ public class OpenCmp implements JsProxyInterface {
 
     private void updateConsentStore(ConsentString consentString) {
         if (consentString != null) {
-            Map<OpenCmpStore.Property, Object> preferencesMap = TCStringHelper.buildPreferences(consentString);
+            Map<Property, Object> preferencesMap = TCStringHelper.buildPreferences(consentString);
             store.update(preferencesMap);
         }
     }
