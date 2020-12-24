@@ -34,7 +34,7 @@ public class OpenCmp implements JsProxyInterface {
 
     private boolean windowHasFocus = false;
     private boolean waitingForPopup = false;
-    private WebView cmpView;
+    private OpenCmpWebView cmpView;
     private PopupWindow popupWindow;
 
     private OpenCmpErrorHandler errorHandler = error -> { };
@@ -152,7 +152,7 @@ public class OpenCmp implements JsProxyInterface {
             html = html.replaceAll("\\$domain", context.getDomain());
             // in Webview oeffnen
             cmpView = new OpenCmpWebView(appContext);
-            cmpView.addJavascriptInterface(new JsProxy(this), "opencmpInAppProxy");
+            cmpView.addJavascriptInterface(new JsProxy(this, cmpView), "opencmpInAppProxy");
 
             cmpView.clearHistory();
             cmpView.clearFormData();

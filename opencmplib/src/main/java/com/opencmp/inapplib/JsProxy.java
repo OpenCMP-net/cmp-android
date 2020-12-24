@@ -13,24 +13,29 @@ public class JsProxy {
      * Handler fuer Callbacks
      */
     private final JsProxyInterface handler;
+    private final OpenCmpWebView webView;
 
-    public JsProxy(JsProxyInterface handler) {
+    public JsProxy(JsProxyInterface handler, OpenCmpWebView webView) {
         this.handler = handler;
+        this.webView = webView;
     }
 
     /**
      * CMP holt sich den Consent aus SharedPreferences
+     *
      * @return
      * @throws JSONException
      */
     @JavascriptInterface
-    public String getConsent() throws JSONException {
-        Log.d("getConsent", "getConsent");
-        return this.handler.onRequestConsentString().toJson().toString();
+    public void getConsent(String promiseId) throws JSONException {
+        Log.d("JsProxy", "getConsent " + promiseId);
+        JSONObject json = this.handler.onRequestConsentString().toJson();
+        webView.resolvePromise(promiseId, json);
     }
 
     /**
      * CMP speichert den Consent in SharedPreferences
+     *
      * @param consentStringJson
      * @throws JSONException
      */
@@ -43,6 +48,7 @@ public class JsProxy {
 
     /**
      * Reine Testmethode
+     *
      * @param html
      */
     @JavascriptInterface
