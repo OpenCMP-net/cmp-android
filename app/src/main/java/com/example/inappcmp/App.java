@@ -16,12 +16,8 @@ public class App extends Application {
 
         // CMP initialisation
         OpenCmpConfig config = new OpenCmpConfig.Builder("traffective.com")
-            // optional, if it is skipped the library takes default SharedPreference name
-            .setStorageName("open_cmp.storage")
-            // Optional value, null as default
             // Error handling
             .setErrorHandler(this::handleError)
-            // Optional value, null as default
             // Check Consent Changes, you can extend interface OpenCmpStore
             .setChangesListener(this::consentChanged)
             .build();
