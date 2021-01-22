@@ -3,7 +3,9 @@
 ##Voraussetzungen:
 * Minimum API: 24
 * Android Studio
+
 ##Struktur
+
 Das Package enthaelt zwei Order:
 - app: Beispiel-Integration
 - opencmplib: Die CMP-Library, die in die App importiert werden muss
