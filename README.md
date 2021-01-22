@@ -1,15 +1,15 @@
-#Integration
+# Integration
 
-##Voraussetzungen:
+## Voraussetzungen:
 * Minimum API: 24
 * Android Studio
 
-##Struktur
+## Struktur
 
 Das Package enthaelt zwei Order:
 - app: Beispiel-Integration
 - opencmplib: Die CMP-Library, die in die App importiert werden muss
-##Integration
+## Integration
 Die Integration erfolgt in der Application Klasse:
 ```
 import android.app.Application;
@@ -46,8 +46,8 @@ public class App extends Application {
     }
 }
 ```
-##Features
-###Button fuer nachtraegliche Einstellungen
+## Features
+### Button fuer nachtraegliche Einstellungen
 Es kann ein Button konfiguriert werden, ueber den der User nachtraeglich das CMP oeffnen und Einstellungen aendern kann. Dazu muss ein Button mit einer bestimmten Id erstellt werden:
 ```
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -58,12 +58,12 @@ Es kann ein Button konfiguriert werden, ueber den der User nachtraeglich das CMP
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_alert" />
 ```
-###Zugriff auf Consent
+### Zugriff auf Consent
 Der Consent ist in den Default Shared Preferences gespeichert und kann direkt von dort gelesen und auch auf Aenderungen reagiert werden.
 Die im Consent enthaltenen Key-Value-Paare entnehmen Sie bitte der Spezifikation der IAB:
 https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#how-is-a-cmp-used-in-app 
 
-####Wie koennen Vendoren Aenderungen am Consent erkennen?
+#### Wie koennen Vendoren Aenderungen am Consent erkennen?
 ```
 Context mContext = getApplicationContext();
 SharedPreferences mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
