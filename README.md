@@ -1,14 +1,16 @@
 #Integration
 
-##Voraussetzungen:
+##Requirements:
 * Minimum API: 24
 * Android Studio
-##Struktur
-Das Package enthaelt zwei Order:
-- app: Beispiel-Integration
-- opencmplib: Die CMP-Library, die in die App importiert werden muss
+
+##Source Structure
+The sources contain two folders:
+- opencmplib: The library itself, that has to be imported into the consuming project
+- app: Integration demo
+
 ##Integration
-Die Integration erfolgt in der Application Klasse:
+The integration can be done in the class Application:
 ```
 import android.app.Application;
 import android.util.Log;
@@ -44,9 +46,12 @@ public class App extends Application {
     }
 }
 ```
+
 ##Features
-###Button fuer nachtraegliche Einstellungen
-Es kann ein Button konfiguriert werden, ueber den der User nachtraeglich das CMP oeffnen und Einstellungen aendern kann. Dazu muss ein Button mit einer bestimmten Id erstellt werden:
+
+###Button for changing consent settings
+A button can be configured to enable the user to open the CMP UI again to make changes with the previously stored consent.
+To display the button a specific Id has to be added to the layout:
 ```
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@id/setup_button_id"
@@ -56,12 +61,13 @@ Es kann ein Button konfiguriert werden, ueber den der User nachtraeglich das CMP
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_alert" />
 ```
-###Zugriff auf Consent
-Der Consent ist in den Default Shared Preferences gespeichert und kann direkt von dort gelesen und auch auf Aenderungen reagiert werden.
-Die im Consent enthaltenen Key-Value-Paare entnehmen Sie bitte der Spezifikation der IAB:
+###How to access the consent
+The consent is stored in the Shared Preferences und can be read directly from there. The app can also listen and react to changes to the consent.
+
+Please read the IAB specs for the specific names of the key value pairs that are stored:
 https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#how-is-a-cmp-used-in-app 
 
-####Wie koennen Vendoren Aenderungen am Consent erkennen?
+####How can vendors listen to changes of the consent?
 ```
 Context mContext = getApplicationContext();
 SharedPreferences mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
