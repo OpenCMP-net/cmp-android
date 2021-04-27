@@ -82,7 +82,7 @@ public class SharedPreferenceOpenCmpStore implements OpenCmpStore {
         ConsentString cs = new ConsentString();
         cs.tcf = preferences.getString(Property.IABTCF_TCString.name(), null);
         cs.custom = preferences.getString(Property.IABTCF_CustomTCString.name(), null);
-        cs.google = preferences.getString(Property.IABTCF_GoogleConsent.name(), null);
+        cs.google = preferences.getString(Property.IABTCF_AddtlConsent.name(), null);
         String metaJson = preferences.getString(Property.OpenCmp_Meta.name(), (new JSONObject()).toString());
         try {
             cs.meta = new JSONObject(metaJson);

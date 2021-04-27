@@ -14,7 +14,7 @@ public class TCStringHelper {
         Map<Property, Object> preferences = new HashMap<>();
         preferences.put(Property.IABTCF_TCString, consentString.tcf);
         preferences.put(Property.IABTCF_CustomTCString, consentString.custom);
-        preferences.put(Property.IABTCF_GoogleConsent, consentString.google);
+        preferences.put(Property.IABTCF_AddtlConsent, consentString.google);
         preferences.put(Property.OpenCmp_Meta, consentString.meta.toString());
 
         Iterator<String> prefIterator = consentString.preferences.keys();

@@ -22,7 +22,7 @@ public enum Property {
     IABTCF_CustomVendorLegitimateInterests(String.class),
     // Custom
     IABTCF_CustomTCString(String.class),
-    IABTCF_GoogleConsent(String.class);
+    IABTCF_AddtlConsent(String.class);
 
     final Class<?> type;
 
