@@ -1,0 +1,326 @@
+<!doctype html>
+<html ⚡>
+    <head>
+        <meta charset="utf-8">
+        <link
+                rel="canonical"
+                href="https://amp.dev/documentation/examples/user-consent/client_side_user_consent_flow/index.html">
+        <meta
+                name="viewport"
+                content="width=device-width,minimum-scale=1,initial-scale=1">
+        <meta
+                name="amp-consent-blocking"
+                content="amp-ad">
+        <script
+                async
+                src="https://cdn.ampproject.org/v0.js"></script>
+        <title>Client Side User Consent Flow</title>
+        <!-- ## Setup -->
+        <!-- Import the consent component in the header. -->
+        <script
+                async
+                custom-element="amp-iframe"
+                src="https://cdn.ampproject.org/v0/amp-iframe-0.1.js"></script>
+        <!-- for this example we use `amp-ad` as well as... -->
+        <script
+                async
+                custom-element="amp-ad"
+                src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+        <!-- ... `amp-list` together with... -->
+        <script
+                async
+                custom-element="amp-list"
+                src="https://cdn.ampproject.org/v0/amp-list-0.1.js"></script>
+        <!-- ... `amp-mustache`. -->
+        <script
+                async
+                custom-template="amp-mustache"
+                src="https://cdn.ampproject.org/v0/amp-mustache-0.2.js"></script>
+        <script
+                async
+                custom-element="amp-sticky-ad"
+                src="https://cdn.ampproject.org/v0/amp-sticky-ad-1.0.js"></script>
+        <script
+                async
+                custom-element="amp-fx-flying-carpet"
+                src="https://cdn.ampproject.org/v0/amp-fx-flying-carpet-0.1.js"></script>
+        <script
+                async
+                custom-element="amp-consent"
+                src="https://cdn.ampproject.org/v0/amp-consent-0.1.js"></script>
+        <style amp-boilerplate>body {
+        -webkit-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
+        -moz-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
+        -ms-animation: -amp-start 8s steps(1, end) 0s 1 normal both;
+        animation: -amp-start 8s steps(1, end) 0s 1 normal both
+    }
+
+    @-webkit-keyframes -amp-start {
+        from {
+            visibility: hidden
+        }
+        to {
+            visibility: visible
+        }
+    }
+
+    @-moz-keyframes -amp-start {
+        from {
+            visibility: hidden
+        }
+        to {
+            visibility: visible
+        }
+    }
+
+    @-ms-keyframes -amp-start {
+        from {
+            visibility: hidden
+        }
+        to {
+            visibility: visible
+        }
+    }
+
+    @-o-keyframes -amp-start {
+        from {
+            visibility: hidden
+        }
+        to {
+            visibility: visible
+        }
+    }
+
+    @keyframes -amp-start {
+        from {
+            visibility: hidden
+        }
+        to {
+            visibility: visible
+        }
+    }
+        </style>
+        <noscript>
+            <style amp-boilerplate>body {
+            -webkit-animation: none;
+            -moz-animation: none;
+            -ms-animation: none;
+            animation: none
+        }
+            </style>
+        </noscript>
+        <style amp-custom>
+        :root {
+            --space-2: 1rem; /* 16px */
+            --space-3: 1.5rem; /* 24px */
+        }
+
+        .consentPopup {
+            padding: var(--space-3);
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 5px;
+            position: relative;
+            max-width: 700px;
+            width: 95%;
+        }
+
+        .consentPopup > h2, /* overwrite ABE style */
+        .consentPopup > * {
+            margin: 0;
+            margin-bottom: var(--space-2);
+        }
+
+        .consentPopup > button {
+            margin-right: var(--space-2);
+        }
+
+        .popupOverlay {
+            height: 100vh;
+            width: 100vw;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5% 0;
+        }
+
+        .dismiss-button {
+            position: absolute;
+            right: var(--space-3);
+            top: var(--space-2);
+            cursor: pointer;
+        }
+
+        #post-consent-ui {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-3);
+        }
+
+        #opencmp-consent-prompt-ui {
+            transform: rotate(-90deg);
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            margin-top: -80px;
+            transform-origin: top right;
+        }
+
+        #opencmp-consent-prompt-ui button {
+            border: none;
+            background-color: blue;
+            color: white;
+            line-height: 30px;
+            font-size: 20px;
+            cursor: pointer;
+            text-align: center;
+            width: 160px;
+        }
+
+        </style>
+    </head>
+    <body>
+<!--        <amp-ad-->
+<!--                data-block-on-consent-->
+<!--                width="300"-->
+<!--                height="250"-->
+<!--                layout="fixed"-->
+<!--                type="doubleclick"-->
+<!--                json='{"targeting":{"placement":["Flying_Carpet"],"channel":["amp"],"zone":["nationalnews"]}}'-->
+<!--                data-slot="/5176/idan.webnachrichten.de/nationalnews"-->
+<!--                rtc-config='{"urls":["https://pb.traffective.cloud/openrtb2/amp?tag_id=webnachrichten.de_flying_carpet&gdpr_consent=CONSENT_STRING"]}'></amp-ad>-->
+
+        <amp-consent
+                id="consent"
+                layout="nodisplay"
+                type="opencmp">
+            <script type="application/json">
+                {
+                    "clientConfig": {
+                        "domain": "traffective.com"
+                    },
+                    "uiConfig": {
+                        "overlay": true
+                    }
+                }
+            </script>
+        </amp-consent>
+
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent
+            libero. Sed cursus ante dapibus
+            diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum.
+            Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum
+            lacinia arcu eget nulla.
+        </p>
+
+        <p>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
+            himenaeos. Curabitur sodales ligula
+            in libero. Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh.
+            Aenean quam. In scelerisque sem at dolor. Maecenas mattis. Sed convallis tristique sem.
+            Proin ut ligula vel nunc
+            egestas porttitor. Morbi lectus risus, iaculis vel, suscipit quis, luctus non,
+            massa. Fusce ac turpis quis ligula lacinia aliquet.
+        </p>
+
+        <p>Mauris ipsum. Nulla metus metus, ullamcorper vel, tincidunt sed, euismod in, nibh.
+            Quisque volutpat condimentum
+            velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per
+            inceptos himenaeos. Nam nec ante. Sed lacinia, urna non tincidunt mattis, tortor neque
+            adipiscing diam, a cursus
+            ipsum ante quis turpis. Nulla facilisi. Ut fringilla. Suspendisse potenti. Nunc
+            feugiat mi a tellus consequat imperdiet. Vestibulum sapien. Proin quam. Etiam ultrices.
+        </p>
+
+        <p>Suspendisse in justo eu magna luctus suscipit. Sed lectus. Integer euismod lacus luctus
+            magna. Quisque cursus, metus
+            vitae pharetra auctor, sem massa mattis sem, at interdum magna augue eget diam.
+            Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
+            Morbi lacinia molestie dui.
+            Praesent blandit dolor. Sed non quam. In vel mi sit amet augue congue elementum.
+            Morbi in ipsum sit amet pede facilisis laoreet. Donec lacus nunc, viverra nec, blandit
+            vel, egestas et, augue.
+            Vestibulum tincidunt malesuada tellus.
+        </p>
+
+        <p>Ut ultrices ultrices enim. Curabitur sit amet mauris. Morbi in dui quis est pulvinar
+            ullamcorper. Nulla facilisi.
+            Integer lacinia sollicitudin massa. Cras metus. Sed aliquet risus a tortor. Integer
+            id quam. Morbi mi. Quisque nisl felis, venenatis tristique, dignissim in, ultrices sit
+            amet, augue. Proin sodales
+            libero eget ante. Nulla quam. Aenean laoreet. Vestibulum nisi lectus, commodo ac,
+            facilisis ac, ultricies eu, pede.
+        </p>
+
+        <p>Ut orci risus, accumsan porttitor, cursus quis, aliquet eget, justo. Sed pretium blandit
+            orci. Ut eu diam at pede
+            suscipit sodales. Aenean lectus elit, fermentum non, convallis id, sagittis at,
+            neque. Nullam mauris orci, aliquet et, iaculis et, viverra vitae, ligula. Nulla ut felis
+            in purus aliquam imperdiet.
+            Maecenas aliquet mollis lectus. Vivamus consectetuer risus et tortor. Lorem
+            ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero.
+            Sed cursus ante dapibus diam.
+            Sed nisi.
+        </p>
+
+        <p>Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce
+            nec tellus sed augue semper
+            porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti
+            sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur
+            sodales ligula in libero. Sed
+            dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh. Aenean quam.
+        </p>
+
+        <p>In scelerisque sem at dolor. Maecenas mattis. Sed convallis tristique sem. Proin ut
+            ligula vel nunc egestas
+            porttitor. Morbi lectus risus, iaculis vel, suscipit quis, luctus non, massa. Fusce ac
+            turpis quis ligula lacinia aliquet. Mauris ipsum. Nulla metus metus, ullamcorper vel,
+            tincidunt sed, euismod in,
+            nibh. Quisque volutpat condimentum velit. Class aptent taciti sociosqu ad litora
+            torquent per conubia nostra, per inceptos himenaeos. Nam nec ante. Sed lacinia, urna non
+            tincidunt mattis, tortor
+            neque adipiscing diam, a cursus ipsum ante quis turpis. Nulla facilisi.
+        </p>
+
+        <p>Ut fringilla. Suspendisse potenti. Nunc feugiat mi a tellus consequat imperdiet.
+            Vestibulum sapien. Proin quam. Etiam
+            ultrices. Suspendisse in justo eu magna luctus suscipit. Sed lectus. Integer
+            euismod lacus luctus magna. Quisque cursus, metus vitae pharetra auctor, sem massa
+            mattis sem, at interdum magna
+            augue eget diam. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
+            posuere cubilia Curae; Morbi lacinia molestie dui. Praesent blandit dolor.
+        </p>
+
+        <p>Sed non quam. In vel mi sit amet augue congue elementum. Morbi in ipsum sit amet pede
+            facilisis laoreet. Donec lacus
+            nunc, viverra nec, blandit vel, egestas et, augue. Vestibulum tincidunt
+            malesuada tellus. Ut ultrices ultrices enim. Curabitur sit amet mauris. Morbi in dui
+            quis est pulvinar ullamcorper.
+            Nulla facilisi. Integer lacinia sollicitudin massa. Cras metus. Sed aliquet
+            risus a tortor. Integer id quam.
+        </p>
+
+        <!--
+          Use `data-block-on-consent` attribute to block AMP components until consent is given.
+          Individual AMP components can override  blocking behavior and implement blocking logic themselves.
+
+          Here is an image which is blocked until consent is given:
+        -->
+        <amp-img
+                src="/static/samples/img/landscape_lake_300x201.jpg"
+                width="300"
+                height="201"></amp-img>
+
+        <!--
+        Ads can also be blocked until consent is given, but ad networks can implement own behavior
+        (e.g. default to non-personalized ads without consent, as seen <a href="https://support.google.com/dfp_premium/answer/7678538#amp-pages" target="_blank">
+        documented here</a> for Doubleclick). Note that you may see the same ad when accepting or rejecting consent for this specific example and that's because the example doesn't use personalized information even when accepting consent.<br/>
+        Here is an example of `amp-ad` depending on `amp-consent`:
+        -->
+        <amp-ad
+                data-slot="/30497360/a4a/a4a_native"
+                height="250"
+                type="doubleclick"
+                width="300"></amp-ad>
+
+
+    </body>
+</html>
