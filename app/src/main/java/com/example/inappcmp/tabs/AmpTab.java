@@ -1,7 +1,9 @@
 package com.example.inappcmp.tabs;
 
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,7 +75,8 @@ public class AmpTab extends Fragment {
         }
         cookieManager.setAcceptCookie(true);
         cookieManager.removeSessionCookie();
-        cookieManager.setCookie("https://amp.opencmp.net", "euconsent-v2=CPGbvb5PGbvb5AVACADEBaCsAP_AAH_AAAYgHjtf_X9VbGNjuX59YttkaIEX1tRvo-QjCgaIE-kByNOAcKwEkmAaIBXiICgCIBAAsDLBIAJEDEEAAEgQQIgBASHIIgiEqIAKIALAABMBAQAAAAsKCoAAEQAAhEAJoAEAmmuwS57iT0AEgIBQQogBgAgAAKRBAoIAAAEIHjoVmWpVDENiuWhtYMlEKIEAVpAvAOAjCgCAAmkAiNMAYKwAEkAaABWCICgCIAAgsBIBAAJABEkAAEgRQIABAQDIAAAAqAAIAALAABEBAAAAAAgKCoAAAAAAAAABAAEAgAEQCZZiSUAAgABQAoAAgAAAAIRAAIIAAAAIAAAA.YAAAAAAAAAAA; path=/; domain=amp.opencmp.net; secure; SameSite=None");
+        String consentString = getConsentString();
+        cookieManager.setCookie("https://amp.opencmp.net", "euconsent-v2=" + consentString + "; path=/; domain=amp.opencmp.net; secure; SameSite=None");
         cookieSyncManager.sync();
         reload();
     }
@@ -112,5 +115,11 @@ public class AmpTab extends Fragment {
         }
         myWebView.loadDataWithBaseURL("https://traffective.com", html, "text/html; charset=utf-8", "UTF-8", "");
         Log.d(getClass().getName(), html);
+    }
+
+    private String getConsentString() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String consentString = prefs.getString("IABTCF_TCString", null);
+        return consentString;
     }
 }
