@@ -1,6 +1,7 @@
 package com.opencmp.inapplib;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -41,6 +42,7 @@ public class OpenCmpWebView extends WebView {
         webSettings.setGeolocationEnabled(true);
         setWebViewClient(new OpenCmpWebviewClient());
 //        setWebChromeClient(new WebChromeClient());
+        setBackgroundColor(Color.TRANSPARENT);
     }
 
     public void resolvePromise(String promiseId, JSONObject jsonObject) {
