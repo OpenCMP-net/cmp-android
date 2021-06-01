@@ -83,3 +83,24 @@ mListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 
 mPreferences.registerOnSharedPreferenceChangeListener(mListener);
 ```
+### Inject consent into AMP Webview
+
+To populate the consent in an AMP webview, a cookie can be injected. The consuming app is responsible for managing that cookie.
+
+Implemented in `AmpTab.java`:
+
+```
+private void setCookieAndReload() {
+    CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(myWebView.getContext());
+    CookieManager cookieManager = CookieManager.getInstance();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        cookieManager.setAcceptThirdPartyCookies(myWebView, true); // API 21
+    }
+    cookieManager.setAcceptCookie(true);
+    cookieManager.removeSessionCookie();
+    String consentString = getConsentString();
+    cookieManager.setCookie("https://amp.opencmp.net", "euconsent-v2=" + consentString + "; path=/; domain=amp.opencmp.net; secure; SameSite=None");
+    cookieSyncManager.sync();
+    reload();
+}
+```
