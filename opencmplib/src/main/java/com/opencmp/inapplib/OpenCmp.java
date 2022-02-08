@@ -37,14 +37,17 @@ public class OpenCmp implements JsProxyInterface {
     private OpenCmpWebView cmpView;
     private PopupWindow popupWindow;
 
-    private OpenCmpErrorHandler errorHandler = error -> { };
+    private OpenCmpErrorHandler errorHandler = error -> {
+    };
 
     private Activity currentActivity;
+
+    private static OpenCmp instance;
 
     public static void initialize(@NonNull Application app, @NonNull OpenCmpConfig config) {
 
         final OpenCmpContext cmpContext = new OpenCmpContext(config.domain);
-        final String storeName =  config.storageName != null ? config.storageName : PreferenceManager.getDefaultSharedPreferencesName(app);
+        final String storeName = config.storageName != null ? config.storageName : PreferenceManager.getDefaultSharedPreferencesName(app);
         final SharedPreferences prefs = app.getSharedPreferences(storeName, Context.MODE_PRIVATE);
         final SharedPreferenceOpenCmpStore store = new SharedPreferenceOpenCmpStore(prefs, config.changesListener);
 
@@ -53,6 +56,8 @@ public class OpenCmp implements JsProxyInterface {
         WebView.setWebContentsDebuggingEnabled(true);
 
         app.registerActivityLifecycleCallbacks(new OpenCmpLifecycleListener(openCmp));
+
+        instance = openCmp;
     }
 
 
@@ -84,10 +89,10 @@ public class OpenCmp implements JsProxyInterface {
     }
 
     private OpenCmp(
-        Context appContext,
-        OpenCmpContext context,
-        OpenCmpStore store,
-        @Nullable OpenCmpErrorHandler errorHandler
+            Context appContext,
+            OpenCmpContext context,
+            OpenCmpStore store,
+            @Nullable OpenCmpErrorHandler errorHandler
     ) {
         this.context = context;
         this.appContext = appContext;
@@ -102,7 +107,6 @@ public class OpenCmp implements JsProxyInterface {
             this.errorHandler.onOpenCmpError(e);
         }
     }
-
 
 
     private void setupButtons() {
@@ -127,6 +131,13 @@ public class OpenCmp implements JsProxyInterface {
         if (btnView != null) {
             btnView.setOnClickListener(v -> triggerShowUi());
         }
+    }
+
+    /**
+     * Zeigt das CMP an.
+     */
+    public static void show() {
+        instance.triggerShowUi();
     }
 
     /**
