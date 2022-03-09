@@ -1,5 +1,7 @@
 package com.opencmp.inapplib;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.util.Log;
 import android.webkit.SslErrorHandler;
@@ -19,7 +21,11 @@ public class OpenCmpWebviewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         Log.d("url", url);
-        view.loadUrl(url);
+        // Url in externem Browser laden
+        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        view.getContext().startActivity(i);
+//        view.loadUrl(url);
         return true;
     }
 
