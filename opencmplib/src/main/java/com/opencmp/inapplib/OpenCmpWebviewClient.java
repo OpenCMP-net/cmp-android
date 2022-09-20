@@ -32,7 +32,7 @@ public class OpenCmpWebviewClient extends WebViewClient {
     @Override
     public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
         Log.w("SSL error:", error.getUrl());
-        handler.proceed(); // Ignore SSL certificate errors
+        Toast.makeText(view.getContext(), "SSL error occured", Toast.LENGTH_SHORT).show();
     }
 
     @Override
